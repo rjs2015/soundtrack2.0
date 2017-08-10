@@ -1,0 +1,57 @@
+.table_row {
+    display: table;
+}
+
+.description {
+    float: none;
+    display: table-cell; 
+    vertical-align: middle;    
+    margin:0px;
+    color: #2ED565;
+    text-shadow: none;
+    font-family: avenir black;
+    font-size: .8em;
+    text-align: left;
+}
+
+.logo {
+    float: none;
+    display: table-cell;
+    vertical-align: middle;
+    font-size:30px;
+    font-family: avenir black;
+    font-style: oblique;
+    font-weight:bold;
+    color: #2ED565;
+    text-shadow: none;
+}
+
+.help {
+    float: none;
+    display: table-cell;
+    vertical-align: middle;    
+}
+    
+
+.clear {
+    position: relative;
+    width:10%;
+    float:right;
+    top:-50px;
+    height:50px;
+    font-size: 12px;
+}
+
+#clear_playlist {
+    width: 75%;
+    height: 50%;
+    margin-top: 10%;
+    margin-right: 70%;
+}
+
+.feature {
+    font-size:16px;
+    text-shadow: none;
+    padding-top:5px;
+    margin-left:10%;
+}

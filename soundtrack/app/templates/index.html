@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+
+  <head> 
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/ >
+    <meta HTTP-EQUIV="X-UA-COMPATIBLE" CONTENT="IE=EmulateIE9" >
+    <script type="text/javascript" src="static/autocomplete.js"></script>
+    <link href="static/multiple-select.min.css" rel="stylesheet">  
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" integrity="sha384-AysaV+vQoT3kOAXZkl02PThvDr8HYKPZhNT5h/CXfBThSRXQ6jW5DO2ekP5ViFdi" crossorigin="anonymous">      
+
+    <title>Playlist Creator</title>
+
+    <!-- Google fonts -->
+    <link rel="stylesheet" href="static/d3.slider.css">
+    <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="static/fonts/bariol/bariol.css"/>
+    <link rel="stylesheet" href="static/style.css"/>
+    <link rel="stylesheet" href="static/help.css"/>
+    <link rel="stylesheet" href="static/formatting.css"/>
+    <link rel="stylesheet" href="static/typeahead.css"/>
+
+    <!-- D3.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+    
+    <style>
+      body {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 1.2em;
+        font-weight: 300;
+        fill: #242424;
+        text-align: center;
+        text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
+        cursor: default;
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        padding: 0px;
+        overflow-x: hidden; 
+      }
+      
+      pre {
+        font-size: .7em;
+      }
+
+      h3 {
+        font-size: 1em;
+      }
+
+      .legend {
+        font-family: 'Raleway', sans-serif;
+        fill: #333333;
+      }
+      
+      .tooltip {
+        fill: #333333;
+      }
+    </style>
+  
+  </head>
+
+  <body>
+      
+    <div class="container-fluid" style="background: #000000;">
+        <div class="row-eq-height table_row" style="background: #000000;">        
+            <div class="col-sm-3 logo">
+                <img src="static/logo.png" style="height:35%; width:60%;">
+            </div>
+              
+            <div class="col-sm-2 help" style="background: #000000;">
+                <div class="help-tip">
+                <p>
+                    This app extends Spotify's playlist themes to your favorite artists, creating new playlists with their music to fit your occasion. <br><br>
+                    1. Choose a theme with the first dropdown, and add artists using the second.<br><br>
+                    2. Move the slider to expand or shrink your playlist<br><br>
+                    3. As you do, watch how the playlist's thematic breakdown changes (the blob on the left). Use this breakdown to optimize the playlist's composition to your liking.<br><br>
+                    To clear all artists from your playlist, use the 'Clear' button. Learn more about how the playlists are generated <a href="https://rjs2015.github.io/2016/11/07/Expanding-Spotify's-Music-Taxonomy/" style="color:#2ED565; text-decoration: none;">here</a>.<br><br>
+                    ***A feature to add the playlist to automatically your Spotify account is in the works!  
+                </p>
+                </div>  
+            </div>    
+      
+            <div class="col-sm-7 description"> 
+Having music to accompany your lifestyle is important. This app allows you to quickly build custom playlists with your favorite artists to fit the different stages of your day, leveraging data from Spotify and Gracenote.
+            </div>     
+        </div>
+  </div>
+
+    <div id="category_selector" style="width:100%; height:100%; border: 0px;"></div>
+
+    <div>
+    <div id="category_selector_2" style="width:100%; height:100%;"></div>
+            
+    <div class = "clear">
+    <button id="clear_playlist" type="button">Clear Playlist</button>
+    </div>
+    </div>
+      
+<!--     <div ng-app='selector' ng-controller='controller'>
+    <multiple-autocomplete ng-model="selectedList" object-property="artist" suggestions-arr="artist_list">
+    </multiple-autocomplete>
+    </div>           -->
+      
+    <div id="sliders" class="wrapper" style="background-color: #ffffff;">
+
+      <h2 class="feature">Playlist Length: <span id="playlist_size">0</span>
+      </h2>
+      <div id="playlist_length"></div>
+
+    </div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12 col-lg-5 radarChart">
+            </div>
+            <div class="col-xs-9 col-lg-5" id="tooltip">
+                <h3 class="tooltip_title" style="text-align:left; padding-top:4em; padding-left:2em;"></h3>
+                <pre class="tooltip_body" style="width:100%; height: 30em; text-align:left; overflow-x: hidden; font-size: .6em;  padding-left:4em;"></pre>
+            </div>
+            <div class="col-xs-3 col-lg-2" id="tooltip_2">
+                <h3 class="tooltip_title" style="text-align:left; padding-top:4em;"></h3>
+                <pre class="tooltip_body" style="width:100%; height: 30em; text-align:left; overflow-x: hidden; font-size: .6em;"></pre>
+            </div>    
+        </div>
+    </div>
+        
+    <!-- raderChart setup   -->
+    <script src="{{url_for('static',filename='radarChart.js')}}"></script>
+
+    <!-- Import the libraries: jQuery, d3, d3.slider -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+    <script src="static/d3.slider.js"></script>
+    <script src='static/jquery-3.1.1.min.js'> </script>      
+    <script src='static/angular.min.js'> </script>            
+    <script src="static/multiple-select.min.js"></script> 
+    <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>      
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/js/bootstrap.min.js" integrity="sha384-BLiI7JTZm+JWlgKa0M0kGRpJbF2J8q+qreVrKBC47e3K6BW78kGLrCkeRX6I9RoK" crossorigin="anonymous"></script>      
+
+    <script>
+
+    var selector = angular.module('selector', [
+        'multipleSelect'
+    ]);
+        
+    var category = 'Chill';
+        
+    var tooltip = d3.select("div#tooltip")
+    var playlist_info = 'No songs - add some artists!'
+
+       tooltip.select(".tooltip_title")
+         .text('Your ' + category + ' Playlist')
+
+       tooltip.select(".tooltip_body")
+         .text(playlist_info
+          );
+    
+    var tooltip_2 = d3.select("div#tooltip_2")  
+    tooltip_2.select(".tooltip_title")
+     .text('Artists')
+    
+    var artist = 'clear'
+    
+    var clear_button = document.getElementById('clear_playlist')
+    
+    clear_button.onclick = function() {
+        artist = 'clear';
+        getAndDrawBlob(playlist_size,category,artist);
+    }
+        
+    var artists;     
+        
+    d3.csv("static/artists_typeahead.csv",function (csv) {
+        artists=csv;
+        start();
+        });
+    
+    var artist_list=[];
+    d3.csv("static/artists_typeahead.csv", function(data) {
+      artist_list=data;        
+    });
+
+    console.log(artist_list);
+    
+    var categories = [{'Category':'Chill'},
+                      {'Category':'Workout'},
+                      {'Category':'Party'},
+                      {'Category':'Travel'},
+                      {'Category':'Sleep'}]
+
+    //Call back for when user selects an option
+    function onSelect(d) {
+        if (typeof d.Category === 'undefined') {category = category;} else {category = d.Category;}
+        if (typeof d.artist === 'undefined') {artist = artist;} else {artist = d.artist;}
+
+        color = d3.scale.ordinal()
+        .range(cat_colors[category]);
+
+        radarChartOptions = {
+        w: width,
+        h: height,
+        margin: margin,
+        maxValue: 1,
+        levels: 5,
+        roundStrokes: true,
+        color: color
+        };
+        getAndDrawBlob(playlist_size,category,artist);
+    }
+
+    //Setup and render the autocomplete
+    function start() {
+        var mc = autocomplete(document.getElementById('category_selector'))
+                .keys(categories)
+                .dataField("Category")
+                .placeHolder("Select Theme (Currently 'Chill')")
+                .width(960)
+                .height(00)
+                .onSelected(onSelect)
+                .render()
+
+        var mc_2 = autocomplete(document.getElementById('category_selector_2'))
+                .keys(artists)
+                .dataField("artist")
+                .placeHolder("Add Artists")
+                .width(960)
+                .height(00)
+                .onSelected(onSelect)
+                .render();                
+    }
+
+     var playlist_size = 0;
+
+     <!-- FUNCTION TO DRAW PLAYLIST ALIGNMENT AND UPDATE CONTENTS -->
+     function getAndDrawBlob(playlist_size,category,artist) {
+
+      var data = JSON.stringify({
+        info: [playlist_size,category,artist]
+      });
+
+       $.ajax({
+         type: "POST",
+         contentType: "application/json; charset=utf-8",
+         url: "/main/",
+         dataType: "json",
+         async: true,
+         data: data,
+         success: function (data) {
+          var data_2 = [
+          [{'axis': 'Party', 'value': data['Party']},
+          {'axis': 'Workout', 'value': data['Workout']},
+          {'axis': 'Chill', 'value': data['Chill']},
+          {'axis': 'Sleep', 'value': data['Sleep']},
+          {'axis': 'Travel', 'value': data['Travel']}]
+          ];
+           RadarChart(".radarChart", data_2, radarChartOptions);
+          var playlist_info = data['playlist_info'];
+             tooltip.select(".tooltip_title")
+               .text('Your ' + category +  ' Playlist')
+             tooltip.select(".tooltip_body")
+               .text(playlist_info);
+          var artist_info = data['artist_info'];
+             tooltip_2.select(".tooltip_title")
+               .text('Artists')
+             tooltip_2.select(".tooltip_body")
+               .text(artist_info);
+             var classname = document.getElementsByClassName("radarWrapper");
+             var export_playlist = function() {
+                  var data = JSON.stringify({
+                  info: [-1]
+                  });
+                    $.ajax({
+                             type: "POST",
+                             contentType: "application/json; charset=utf-8",
+                             url: "/main/",
+                             dataType: "json",
+                             async: true,
+                             data: data,
+                             success: function (data) {
+                                window.location = data['auth'];
+                             },
+                             error: function (result) {
+                             }
+                           })
+             };
+             for (var i = 0; i < classname.length; i++) {
+                classname[i].addEventListener('click', export_playlist, false);
+             }
+         },
+         error: function (result) {
+         }
+       })
+     }
+
+      ///////////////////// Radar Chart Set-Up //////////////////////
+
+      var margin = {top: 90, right: 100, bottom: 10, left: 100},
+        width = Math.min(600, window.innerWidth - 10) - margin.left - margin.right,
+        height = Math.min(width, window.innerHeight - margin.top - margin.bottom - 20);
+      
+      ////////////////////////// Data ////////////////////////////// 
+      
+      var data = [
+          [{'axis': 'Party', 'value': 0.0},
+          {'axis': 'Workout', 'value': 0.0},
+          {'axis': 'Chill', 'value': 0.0},
+          {'axis': 'Sleep', 'value': 0.0},
+          {'axis': 'Travel', 'value': 0.0}]
+          ];
+      
+      //////////////////// Draw the Chart ////////////////////////// 
+    
+      var cat_colors;
+
+      function colors() {cat_colors={'Party':["#ffa500"],
+                               'Workout':["#CC333F"],
+                               'Chill':["#008080"],
+                               'Sleep':["#800080"],
+                               'Travel':["#008000"]}};
+
+      colors()
+
+      var color = d3.scale.ordinal()
+        .range(cat_colors['Chill']);
+        
+      var radarChartOptions = {
+        w: width,
+        h: height,
+        margin: margin,
+        maxValue: 1,
+        levels: 5,
+        roundStrokes: true,
+        color: color
+      };
+      //Call function to draw the Radar chart
+      RadarChart(".radarChart", data, radarChartOptions);
+
+     <!-- SLIDERS -->
+
+     d3.select('#playlist_length')
+       .call(
+         d3.slider()
+           .value(playlist_size)
+           .step(1)
+           .axis(true)
+           .on("slide", function(evt,value) {
+             d3.select('#playlist_size').text(value);
+             playlist_size = value;
+             getAndDrawBlob(playlist_size,category,artist)
+           }
+           )
+       );
+
+    </script>
+
+  </body>
+</html>
